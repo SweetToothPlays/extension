@@ -1,0 +1,64 @@
+/*This can be achieved by adding an event listener for the keydown event to detect when the Esc key is pressed:*/
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    closeModal(); // Assuming `closeModal` is a function to hide the modal
+  }
+});
+
+function closeModal() {
+  const modal = document.querySelector('.modal');
+  if (modal) {
+    modal.style.display = 'none';
+    // Optionally return focus to the triggering element
+    lastFocusedElement.focus();
+  }
+}
+function trapFocus(modal) {
+  const focusableElements = modal.querySelectorAll(
+    'a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])'
+  );
+  const firstElement = focusableElements[0];
+  const lastElement = focusableElements[focusableElements.length - 1];
+
+  modal.addEventListener('keydown', (event) => {
+    if (event.key === 'Tab') {
+      if (event.shiftKey) {
+        // If Shift+Tab is pressed and focus is on the first element, move focus to the last element
+        if (document.activeElement === firstElement) {
+          event.preventDefault();
+          lastElement.focus();
+        }
+      } else {
+        // If Tab is pressed and focus is on the last element, move focus to the first element
+        if (document.activeElement === lastElement) {
+          event.preventDefault();
+          firstElement.focus();
+        }
+      }
+    }
+  });
+}
+let lastFocusedElement; // Store the last focused element before modal opens
+
+function openModal() {
+  lastFocusedElement = document.activeElement;
+  const modal = document.querySelector('.modal');
+  modal.style.display = 'block';
+  trapFocus(modal);
+  modal.querySelector('input, button, a').focus(); // Focus on the first input or button in modal
+}
+
+function closeModal() {
+  const modal = document.querySelector('.modal');
+  modal.style.display = 'none';
+  lastFocusedElement.focus(); // Restore focus to the previously focused element
+}
+document.querySelectorAll('button, [role="button"]').forEach((button) => {
+  button.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      button.click(); // Simulate a click when Enter or Space is pressed
+    }
+  });
+});
+
